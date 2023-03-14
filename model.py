@@ -5,9 +5,10 @@ import tensorflow as tf
 
 
 class RecommendationSystem:
-    def __init__(self, ratings, books) -> None:
+    def __init__(self, ratings, books, users) -> None:
         self.ratings = ratings
         self.books = books
+        self.users = users
 
     def build_model(self, embedding_dim: int = 10):
         # The total number of the unique users and books
@@ -68,17 +69,23 @@ class RecommendationSystem:
 
 if __name__ == "__main__":
     # Load the book ratings dataset
-    ratings = pd.read_csv("Data/BX-Book-Ratings.csv", low_memory=False)
-    books = pd.read_csv("Data/BX-Books.csv", low_memory=False)
+    ratings = pd.read_csv("Data/BX-Book-Ratings.csv", sep=";", low_memory=False)
+    books = pd.read_csv(
+        "Data/BX-Books.csv", sep=";", on_bad_lines="skip", low_memory=False
+    )
+    users = pd.read_csv(
+        "Data/BX-Users.csv", sep=";", on_bad_lines="skip", low_memory=False
+    )
 
     # Encode the user id and book id to an int type
+    users["User-ID"] = LabelEncoder().fit_transform(users["User-ID"])
     ratings["User-ID"] = LabelEncoder().fit_transform(ratings["User-ID"])
     ratings["ISBN"] = LabelEncoder().fit_transform(ratings["ISBN"])
     books["ISBN"] = LabelEncoder().fit_transform(books["ISBN"])
 
-    model = RecommendationSystem(ratings, books)
-    model.build_model()
-    model.fit(
+    model = RecommendationSystem(ratings, books, users)
+
+    model.build_model().fit(
         [model.ratings["User-ID"], model.ratings["ISBN"]],
         model.ratings["Book-Rating"],
         epochs=5,
