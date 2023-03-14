@@ -58,6 +58,10 @@ class RecommendationSystem:
             epochs=epoch,
         )
 
+    def build_fit_model(self, epoch=10):
+        self.build_model()
+        self.fit_model()
+
     def recommend_books(self, user_id, num_recommendations=10):
         # Get the user embedding weight to calculate the accuracy score of a prediction
         user_embedding = self.model.get_layer(name="user_embedding").get_weights()[0][
@@ -107,9 +111,7 @@ if __name__ == "__main__":
 
     model = RecommendationSystem(ratings, books, users)
 
-    model.build_model()
-
-    model.fit_model()
+    model.build_fit_model()
 
     # Recommend books to the user
     model.recommend_books(user_id=0)
