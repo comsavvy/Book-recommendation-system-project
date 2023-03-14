@@ -1,11 +1,12 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 
 
 def load_data(file_path):
     # Load the book ratings dataset
-    df = pd.read_csv(file_path, sep=";", names=["User-ID", "ISBN", "Book-Rating"])
+    df = pd.read_csv(file_path, sep=";", low_memory=False)
     return df
 
 
@@ -66,13 +67,15 @@ if __name__ == "__main__":
     # Dimensionality of the embedding space used to represent users and books
     embedding_dim = 10
 
-    model = build_model(num_users, num_books, embedding_dim)
-    model.fit(
-        [df["User-ID"].values, df["ISBN"].values], df["Book-Rating"].values, epochs=10
-    )
+    # Encode the user id and book id to an int type
+    df["User-ID"] = LabelEncoder().fit_transform(df["User-ID"])
+    df["ISBN"] = LabelEncoder().fit_transform(df["ISBN"])
 
+    model = build_model(num_users, num_books, embedding_dim)
+    model.fit([df["User-ID"], df["ISBN"]], df["Book-Rating"], epochs=5)
+    # Load the book dataset to extract the title
     book_titles = np.loadtxt(
         "Data/BX-Books.csv", dtype=str, delimiter=";", usecols=(1,), unpack=True
     )
-
+    # Recommend books to the user
     recommend_books(model, user_id=0, book_titles=book_titles)
