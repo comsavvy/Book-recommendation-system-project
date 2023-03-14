@@ -77,11 +77,16 @@ if __name__ == "__main__":
         "Data/BX-Users.csv", sep=";", on_bad_lines="skip", low_memory=False
     )
 
-    # Encode the user id and book id to an int type
-    users["User-ID"] = LabelEncoder().fit_transform(users["User-ID"])
-    ratings["User-ID"] = LabelEncoder().fit_transform(ratings["User-ID"])
-    ratings["ISBN"] = LabelEncoder().fit_transform(ratings["ISBN"])
-    books["ISBN"] = LabelEncoder().fit_transform(books["ISBN"])
+    ratings = ratings[ratings["ISBN"].isin(books["ISBN"].values)]
+    ratings = ratings[ratings["User-ID"].isin(users["User-ID"].values)]
+
+    # Transform both the user and the book IDs
+    isbn_transformer = LabelEncoder().fit(books["ISBN"])
+    books["ISBN"] = isbn_transformer.transform(books["ISBN"])
+    ratings["ISBN"] = isbn_transformer.transform(ratings["ISBN"])
+    userid_transformer = LabelEncoder().fit(users["User-ID"])
+    users["User-ID"] = userid_transformer.transform(users["User-ID"])
+    ratings["User-ID"] = userid_transformer.transform(ratings["User-ID"])
 
     model = RecommendationSystem(ratings, books, users)
 
@@ -93,6 +98,4 @@ if __name__ == "__main__":
     # Recommend books to the user
     model.recommend_books(user_id=0)
 
-    ### A known bug occurred
-    ## i.e., Unknow user id or book id
-    # in the dataset.
+    ### Bug fix!
