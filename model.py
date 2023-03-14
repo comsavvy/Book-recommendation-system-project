@@ -87,6 +87,11 @@ class RecommendationSystem:
                 f"Recommended book {i + 1}: {book_title !r} <====> Score: {scores[book_id]}"
             )
 
+    def recommended_books_table(self, num_recommendation=10):
+        return self.books.loc[
+            self.books["ISBN"].isin(self.book_indexes[:num_recommendation]), :
+        ]
+
 
 if __name__ == "__main__":
     # Load the book ratings dataset
@@ -115,5 +120,3 @@ if __name__ == "__main__":
 
     # Recommend books to the user
     model.recommend_books(user_id=0)
-
-    ### Bug fix!
