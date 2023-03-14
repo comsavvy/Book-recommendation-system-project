@@ -48,3 +48,20 @@ def recommend_books(model, user_id, book_titles, num_recommendations=10):
         book_title = book_titles[book_id]
         score = scores[book_id]
         print("Recommended book {}: {} with score {}".format(i + 1, book_title, score))
+
+
+if __name__ == "__main__":
+    df = load_data("ratings.dat")
+    num_users = df["user_id"].nunique()
+    num_books = df["book_id"].nunique()
+
+    embedding_dim = 10
+
+    model = build_model(num_users, num_books, embedding_dim)
+    model.fit([df["user_id"], df["book_id"]], df["rating"], epochs=10)
+
+    book_titles = np.loadtxt(
+        "books.csv", dtype=str, delimiter=",", usecols=(1,), unpack=True
+    )
+
+    recommend_books(model, user_id=0, book_titles=book_titles)
