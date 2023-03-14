@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
 
@@ -40,6 +41,22 @@ class RecommendationSystem:
         self.model.compile(optimizer="adam", loss="mean_squared_error")
 
         return self.model
+
+    def fit_model(self, epoch=10):
+        # Create train and test validation set
+        train_data, test_data = train_test_split(
+            self.ratings, test_size=0.12, random_state=42
+        )
+        # Fit and validate the model
+        self.model.fit(
+            [train_data["User-ID"], train_data["ISBN"]],
+            train_data["Book-Rating"],
+            validation_data=(
+                [test_data["User-ID"].values, test_data["ISBN"].values],
+                test_data["Book-Rating"].values,
+            ),
+            epochs=epoch,
+        )
 
     def recommend_books(self, user_id, num_recommendations=10):
         # Get the user embedding weight to calculate the accuracy score of a prediction
@@ -90,11 +107,10 @@ if __name__ == "__main__":
 
     model = RecommendationSystem(ratings, books, users)
 
-    model.build_model().fit(
-        [model.ratings["User-ID"], model.ratings["ISBN"]],
-        model.ratings["Book-Rating"],
-        epochs=5,
-    )
+    model.build_model()
+
+    model.fit_model()
+
     # Recommend books to the user
     model.recommend_books(user_id=0)
 
