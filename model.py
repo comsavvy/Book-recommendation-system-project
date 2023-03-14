@@ -60,7 +60,7 @@ class RecommendationSystem:
 
     def build_fit_model(self, epoch=10):
         self.build_model()
-        self.fit_model()
+        self.fit_model(epoch)
 
     def recommend_books(self, user_id, num_recommendations=10):
         # Get the user embedding weight to calculate the accuracy score of a prediction
