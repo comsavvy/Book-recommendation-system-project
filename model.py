@@ -92,3 +92,7 @@ if __name__ == "__main__":
     )
     # Recommend books to the user
     model.recommend_books(user_id=0)
+
+    ### A known bug occurred
+    ## i.e., Unknow user id or book id
+    # in the dataset.
